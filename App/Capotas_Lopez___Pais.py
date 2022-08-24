@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 import geocoder
-import json
+import gspread
+
+
 
 #FUNCIONES
 def get_IP():
@@ -10,19 +12,29 @@ def pais_por_IP(ip):
     data = geocoder.ip(ip)
     return data.country
 
-def return_pais_csv(code):
-    data = {}
+def BuscarPaisenSheet(code):
+    sa = gspread.service_account(filename='App/capotas-lopez-35faa4b11037.json')
+    sh = sa.open('Copia de Domicilios')
 
-    with open('App/paises.json', 'r') as file:
-        data = json.load(file)
+    wks = sh.worksheet('Hoja 1')
 
-    #Try and except si no encuentra poner undefined
-    return data[code]
+    data = wks.get_all_records()
+
+    for i in data:
+
+        if i['Code'] == code:
+            return i['Idioma/pais']
+
+    return 'undefined'
+
+
 
 #INICIO DE FLASK
 app = Flask(__name__)
 
 @app.route('/')
+
+
 
 # ---------------- PROGRAMA PRINCIPAL --------------
 def index():
@@ -32,7 +44,7 @@ def index():
     #FOR TESTING
     IP = "200.114.151.167"
 
-    PAIS = return_pais_csv(pais_por_IP(IP))
+    PAIS = BuscarPaisenSheet(pais_por_IP(IP))
 
     data_html={
         'ip': IP,
