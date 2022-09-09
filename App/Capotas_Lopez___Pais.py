@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import geocoder
 import gspread
+from flask_cors import CORS
 
 
 
@@ -31,6 +32,7 @@ def BuscarPaisenSheet(code):
 
 #INICIO DE FLASK
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 
